@@ -1,2 +1,4 @@
 # DexPlusPlusPlugins
-Plugins For DexPlusPlus
+Plugins For Dex++
+
+You can find Dex++ (here)[/Plugins]
