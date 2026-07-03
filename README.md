@@ -1,4 +1,4 @@
 # DexPlusPlusPlugins
-Plugins For Dex++
+Plugins For [Dex++](https://github.com/AZYsGithub/DexPlusPlus)
 
-You can find Dex++ [here](/Plugins)
+You can find Dex++ Plugins [here](/Plugins)
