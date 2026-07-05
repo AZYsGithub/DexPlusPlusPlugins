@@ -1,0 +1,253 @@
+--!nocheck
+
+--// PLUGIN DATA //--
+local pluginData = {
+	Name = "NetworkInfo",
+	FriendlyName = "Network Information",
+}
+local Main, Lib, Apps, Settings
+local Explorer, Properties, ScriptViewer, Notebook
+local API, RMD, env, service, plr, create, createSimple
+local function initDeps(data)
+	Main = data.Main
+	Lib = data.Lib
+	Apps = data.Apps
+	Settings = data.Settings
+
+	API = data.API
+	RMD = data.RMD
+	env = data.env
+	service = data.service
+	plr = data.plr
+	create = data.create
+	createSimple = data.createSimple
+end
+local function initAfterMain()
+	Explorer = Apps.Explorer
+	Properties = Apps.Properties
+	ScriptViewer = Apps.ScriptViewer
+	Notebook = Apps.Notebook
+end
+
+--// HELPERS & VARIABLES //--
+local settings = settings()
+local Network, Physics = settings:GetService("NetworkSettings"), settings:GetService("PhysicsSettings")
+
+local make, typ, call, sleep, mathr = Instance.new, type, pcall, task.wait, math.round
+local UD2, UD, rgb, tostr = UDim2.new, UDim.new, Color3.fromRGB, tostring
+local function setprops(object, props, parent)
+	local instance = typ(object) == "string" and make(object) or object
+	for key, value in props do
+		instance[key] = value
+	end
+	if parent then
+		instance.Parent = parent
+	end
+	return instance
+end
+
+--// STARTER //--
+local function main()
+
+	local NetworkSettings = {}
+	local ListFrame
+
+	local function Addbox(title, default)
+		local frame = Lib.Frame.new()
+		setprops(frame.Gui, {
+			Transparency = 1,
+			Size = UD2(1,0,0,20),
+		}, ListFrame)
+
+		local listlayout = setprops("UIListLayout", {
+			FillDirection = Enum.FillDirection.Horizontal,
+			HorizontalAlignment = Enum.HorizontalAlignment.Left,
+			VerticalAlignment = Enum.VerticalAlignment.Center,
+			Padding = UD(0, 10)
+		}, frame.Gui)
+
+		local checkbox = Lib.Checkbox.new()
+		setprops(checkbox.Gui, {
+			Size = UD2(0,15,0,15)
+		}, frame.Gui)
+
+		local label = Lib.Label.new()
+		setprops(label.Gui, {
+			Size = UD2(1, 0,1, -15),
+			Text = title
+		}, frame.Gui)
+		label.TextTruncate = Enum.TextTruncate.AtEnd
+		checkbox:SetState(default or false)
+
+		return checkbox
+	end
+
+	local function AddSeperator(title)
+		local frame = Lib.Frame.new()
+		setprops(frame.Gui, {
+			Transparency = 1,
+			Size = UD2(1,0,0,20),
+		}, ListFrame)
+
+		local label = setprops(Lib.Label.new(), {
+			Size = UD2(1, 0,1, 0),
+			Text = title,
+			TextSize = 16,
+			TextTruncate = Enum.TextTruncate.AtEnd
+		}, frame.Gui)
+
+		return label
+	end
+
+	local function AddText(text)
+		local frame = Lib.Frame.new()
+		setprops(frame.Gui, {
+			Transparency = 1,
+			Size = UD2(1,0,0,15),
+		}, ListFrame)
+
+		local label = setprops(Lib.Label.new(), {
+			Size = UD2(1, 0,1, 0),
+			TextColor3 = rgb(185,185,185),
+			Text = text,
+			TextSize = 14,
+			TextTruncate = Enum.TextTruncate.AtEnd
+		}, frame.Gui)
+
+		return label
+	end
+
+	--// MAIN UI //--
+	NetworkSettings.Init = function()
+		local window = Lib.Window.new()
+		window:SetTitle("Network Information")
+		window:Resize(250,375)
+		NetworkSettings.Window = window
+
+		local content = window.GuiElems.Content
+
+		ListFrame = setprops("ScrollingFrame", {
+			Size = UD2(1, 0,1, -20),
+			Position = UD2(0, 0, 0, 0),
+			Transparency = 1,
+			CanvasSize = UD2(0,0,0,0),
+			AutomaticCanvasSize = Enum.AutomaticSize.Y,
+			ScrollBarThickness = 16,
+			BottomImage = "",
+			TopImage = "",
+			ScrollBarImageColor3 = rgb(70, 70, 70),
+			ScrollBarImageTransparency = 0,
+			ZIndex = 2,
+			BorderSizePixel = 0
+		}, content)
+
+		local scrollbar = Lib.ScrollBar.new()
+		setprops(scrollbar.Gui, {
+			Size = UD2(1, 0,1, -40),
+		}, content)
+		scrollbar.Gui.Up.ZIndex = 3
+		scrollbar.Gui.Down.ZIndex = 3
+
+		local ScrollGui = scrollbar.Gui
+		ListFrame:GetPropertyChangedSignal("AbsoluteWindowSize"):Connect(function()
+			if ListFrame.AbsoluteCanvasSize ~= ListFrame.AbsoluteWindowSize then
+				ScrollGui.Visible = true
+			else
+				ScrollGui.Visible = false
+			end
+		end)
+
+		local ListLayout = setprops("UIListLayout", {
+			Padding = UD(0, 5)
+		}, ListFrame)
+
+		local Padding = setprops("UIPadding", {
+			PaddingBottom = UD(0, 5),
+			PaddingLeft = UD(0, 10),
+			PaddingRight = UD(0, 10),
+			PaddingTop = UD(0, 5)
+		}, ListFrame)
+
+		--// SETTINGS //--
+
+		AddSeperator(">> NetworkOwnership <<")
+		AddText("information about the game NetworkOwnership")
+
+		local NV1 = Addbox("Show NetworkOwned Objects V1 (local)", false)
+		NV1.OnInput:Connect(function()
+			Physics.AreAwakePartsHighlighted = NV1.Toggled
+		end)
+
+		local NV2 = Addbox("Show NetworkOwned Objects V2 (global)", false)
+		NV2.OnInput:Connect(function()
+			Physics.AreOwnersShown = NV2.Toggled
+		end)
+
+		local SimRadius = Addbox("Show All SimulationRadiuses", false)
+		SimRadius.OnInput:Connect(function()
+			Physics.AreRegionsShown = SimRadius.Toggled
+		end)
+
+		local UP = Addbox("Show UnAchored Parts", Physics.AreNonAnchorsShown)
+		UP.OnInput:Connect(function()
+			Physics.AreNonAnchorsShown = UP.Toggled
+		end)
+
+		AddSeperator(">> Miscellaneous <<")
+		AddText("other stuff that doesn't fit NetworkOwnership category")
+
+		--// can persist
+		local AnimInfo = Addbox("Animations Info", Network.ShowActiveAnimationAsset)
+		AnimInfo.OnInput:Connect(function()
+			Network.ShowActiveAnimationAsset = AnimInfo.Toggled
+		end)
+
+		if raknet then
+			if raknet.desync then
+				local rdesync = Addbox("Raknet Desync", false)
+				rdesync.OnInput:Connect(function()
+					raknet.desync(rdesync.Toggled)
+				end)
+			end
+		end
+
+		local CapPing = false
+		local CappedPing = Addbox("Cap Ping at 999+", CapPing)
+		CappedPing.OnInput:Connect(function()
+			CapPing = CappedPing.Toggled
+		end)
+
+		local Green, Yellow, Red = rgb(85, 255, 85), rgb(255, 255, 85), rgb(255, 85, 85)
+
+		local PingText = AddSeperator("Ping: ")
+		task.spawn(function()
+			while sleep(1) do
+				local PingMs = mathr(plr:GetNetworkPing() * 1000)
+
+				local DisplayText = tostr(PingMs) .. "ms"
+				if CapPing and PingMs > 999 then
+					DisplayText = "999+ms"
+				end
+
+				PingText.Text = "Ping: "..DisplayText
+
+				if PingMs <= 200 then
+					PingText.TextColor3 = Green
+				elseif PingMs <= 600 then
+					PingText.TextColor3 = Yellow
+				else
+					PingText.TextColor3 = Red
+				end
+
+			end
+		end)
+
+	end
+	return NetworkSettings
+end
+
+if gethsfuncs then
+	_G.moduleData = {InitDeps = initDeps, InitAfterMain = initAfterMain, Main = main}
+else
+	return {InitDeps = initDeps, InitAfterMain = initAfterMain, Main = main, PluginData = pluginData}
+end
