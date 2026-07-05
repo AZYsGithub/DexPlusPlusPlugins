@@ -1,5 +1,6 @@
 ### shows Information about the game NetworkOwnership (and other)
 ![Preview](./preview.png)
+
 here's the settings
 ### Main Settings
 `Show NetworkOwned Objects V1 (local):` shows part that are "network owned" (note V1 actually heights parts that "physically simulated" or whatever that means but it's close to NetworkShip. also the reason why theres a (local) it's cuz it only highlights parts that are effected by you and not other players
