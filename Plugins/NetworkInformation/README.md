@@ -22,3 +22,6 @@ Source: https://rubis.app/view?scrap=VbVCUblGFzLq6r4b
 
 if you don't know anything about NetworkOwnerShip you can check the official roblox creator docs: https://create.roblox.com/docs/physics/network-ownership
 or just sreach it up
+
+### Credits
+[Roblox-HttpSpy](https://github.com/AZYsGithub/DexPlusPlusPlugins/discussions/2)
