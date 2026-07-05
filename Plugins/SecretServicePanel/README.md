@@ -1,4 +1,6 @@
 # Secret Service Panel
+![Preview](./preview.png)
+
 Perhaps for larping purposes.
 ## What does this do?
 An executor UI for Dex++
