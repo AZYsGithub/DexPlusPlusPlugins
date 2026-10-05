@@ -18,8 +18,6 @@ here's the settings
 
 `Cap Ping at 999+:` at the bottom of the UI there wull be a ping counter. enabling Cap Ping will make it so the ping will only show 999+ if it surpasses 999
 
-Source: https://rubis.app/view?scrap=VbVCUblGFzLq6r4b
-
 if you don't know anything about NetworkOwnerShip you can check the official roblox creator docs: https://create.roblox.com/docs/physics/network-ownership
 or just sreach it up
 
